@@ -1,0 +1,101 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Denúncias API",
+    "version": "1.0.0",
+    "description": "API REST para gerenciamento de denúncias de bairro (in-memory)."
+  },
+  "servers": [{ "url": "http://localhost:3333" }],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "Login (admin or resident)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object", "properties": { "email": { "type": "string" }, "password": { "type": "string" } }, "required": ["email","password"] }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "token and role", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "400": { "description": "missing fields" },
+          "401": { "description": "invalid credentials" }
+        }
+      }
+    },
+    "/residents": {
+      "post": {
+        "summary": "Register resident",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "name": {"type":"string"}, "cpf": {"type":"string"}, "cep": {"type":"string"}, "address": {"type":"string"}, "number": {"type":"string"}, "complement": {"type":"string"}, "householdCount": {"type":"integer"}, "email": {"type":"string"}, "password": {"type":"string"} }, "required": ["name","cpf","cep","address","number","householdCount","email","password"] } } } },
+        "responses": { "201": { "description": "created" }, "400": { "description": "validation error" }, "409": { "description": "email exists" } }
+      }
+    },
+    "/complaints": {
+      "post": {
+        "summary": "Create complaint (resident)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "type": {"type":"string","enum":["violencia domestica","seguranca","saude","transporte publico","vizinhança","infraestrutura"] }, "address":{"type":"string"}, "number":{"type":"string"}, "complement":{"type":"string"}, "description":{"type":"string"}, "anonymous":{"type":"boolean"} }, "required": ["type","address","number","description"] } } } },
+        "responses": { "201": { "description": "created" }, "400": { "description": "validation" }, "401": { "description": "unauthorized" } }
+      },
+      "get": {
+        "summary": "Search approved complaints by type",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "type", "in": "query", "required": true, "schema": { "type": "string" } } ],
+        "responses": { "200": { "description": "list" }, "400": { "description": "missing type" }, "401": { "description": "unauthorized" } }
+      }
+    },
+    "/complaints/{id}/like": {
+      "post": {
+        "summary": "Like a complaint (resident)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name":"id","in":"path","required":true,"schema":{"type":"string"}}],
+        "responses": { "200": { "description": "liked" }, "401": { "description": "unauthorized" }, "404": { "description": "not found" } }
+      }
+    },
+    "/complaints/by-reporter": {
+      "get": {
+        "summary": "Search approved complaints by reporter name",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name":"name","in":"query","required":true,"schema":{"type":"string"}}],
+        "responses": { "200": { "description": "list" }, "400": { "description": "missing name" } }
+      }
+    },
+    "/complaints/region": {
+      "get": {
+        "summary": "Search approved complaints within 10km of logged resident's CEP coordinate",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "list" }, "401": { "description": "unauthorized" } }
+      }
+    },
+    "/admin/complaints/{id}/approve": {
+      "post": {
+        "summary": "Approve complaint (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name":"id","in":"path","required":true,"schema":{"type":"string"}}],
+        "responses": { "200": { "description": "approved" }, "401": { "description": "unauthorized" }, "403": { "description": "admin required" } }
+      }
+    },
+    "/admin/complaints/{id}": {
+      "delete": {
+        "summary": "Delete complaint (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "name":"id","in":"path","required":true,"schema":{"type":"string"}}],
+        "responses": { "200": { "description": "deleted" }, "404": { "description": "not found" } }
+      }
+    },
+    "/admin/complaints/pending": {
+      "get": {
+        "summary": "List complaints pending approval (admin)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": { "200": { "description": "list" } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    }
+  }
+}
