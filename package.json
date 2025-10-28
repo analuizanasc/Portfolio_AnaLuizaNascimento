@@ -1,0 +1,18 @@
+{
+  "name": "denuncias-api",
+  "version": "1.0.0",
+  "description": "API REST para denúncias de bairro (in-memory, Express, JWT, Swagger)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "author": "analuizanasc",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "swagger-ui-express": "^4.6.3"
+  }
+}
