@@ -3,6 +3,7 @@
 API REST simples para registro e consulta de denúncias de bairro.
 
 Principais características:
+
 - In-memory database (sem persistência)
 - Autenticação JWT para moradores e admin
 - Admin fixo: email `ana@qa.com`, senha `abc123`
