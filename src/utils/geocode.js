@@ -1,9 +1,12 @@
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 // Deterministic mock geocoding: converts an address string into lat/lng floats.
 // Produces coordinates within Brazil-ish bounding box for realism. This is a deterministic hash -> coordinates.
 function geocodeAddress(address) {
-  const hash = crypto.createHash('sha256').update(address || '').digest();
+  const hash = crypto
+    .createHash("sha256")
+    .update(address || "")
+    .digest();
   // Use first 4 bytes for lat, next 4 for lng
   const latBits = hash.readUInt32BE(0);
   const lngBits = hash.readUInt32BE(4);
