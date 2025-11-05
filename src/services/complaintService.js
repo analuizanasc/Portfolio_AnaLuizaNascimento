@@ -1,11 +1,11 @@
-const db = require('../models/db');
-const { geocodeAddress } = require('../utils/geocode');
-const { findById: findResidentById } = require('./residentService');
+const db = require("../models/db");
+const { geocodeAddress } = require("../utils/geocode");
+const { findById: findResidentById } = require("./residentService");
 
 function createComplaint(payload, reporterId) {
   const id = (db.complaints.length + 1).toString();
-  const fullAddress = `${payload.address} ${payload.number} ${payload.complement || ''}`;
-  const coord = geocodeAddress(fullAddress + (reporterId || ''));
+  const fullAddress = `${payload.address} ${payload.number} ${payload.complement || ""}`;
+  const coord = geocodeAddress(fullAddress + (reporterId || ""));
   const complaint = {
     id,
     type: payload.type,
@@ -18,14 +18,14 @@ function createComplaint(payload, reporterId) {
     coordinates: coord,
     approved: false,
     likes: [],
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
   };
   db.complaints.push(complaint);
   return complaint;
 }
 
 function likeComplaint(complaintId, residentId) {
-  const c = db.complaints.find(x => x.id === complaintId);
+  const c = db.complaints.find((x) => x.id === complaintId);
   if (!c) return null;
   if (c.likes.includes(residentId)) return c;
   c.likes.push(residentId);
@@ -33,28 +33,30 @@ function likeComplaint(complaintId, residentId) {
 }
 
 function approveComplaint(complaintId) {
-  const c = db.complaints.find(x => x.id === complaintId);
+  const c = db.complaints.find((x) => x.id === complaintId);
   if (!c) return null;
   c.approved = true;
   return c;
 }
 
 function deleteComplaint(complaintId) {
-  const idx = db.complaints.findIndex(x => x.id === complaintId);
+  const idx = db.complaints.findIndex((x) => x.id === complaintId);
   if (idx === -1) return false;
   db.complaints.splice(idx, 1);
   return true;
 }
 
 function getApprovedByType(type) {
-  return db.complaints.filter(c => c.approved && c.type === type).map(formatComplaintForPublic);
+  return db.complaints
+    .filter((c) => c.approved && c.type === type)
+    .map(formatComplaintForPublic);
 }
 
 function getApprovedByReporterName(name) {
-  const lower = (name || '').toLowerCase();
+  const lower = (name || "").toLowerCase();
   return db.complaints
-    .filter(c => c.approved)
-    .filter(c => {
+    .filter((c) => c.approved)
+    .filter((c) => {
       if (!c.reporterId) return false;
       const r = findResidentById(c.reporterId);
       return r && r.name.toLowerCase().includes(lower);
@@ -63,11 +65,11 @@ function getApprovedByReporterName(name) {
 }
 
 function getPending() {
-  return db.complaints.filter(c => !c.approved);
+  return db.complaints.filter((c) => !c.approved);
 }
 
 function findById(id) {
-  return db.complaints.find(c => c.id === id);
+  return db.complaints.find((c) => c.id === id);
 }
 
 function formatComplaintForPublic(c) {
@@ -78,11 +80,11 @@ function formatComplaintForPublic(c) {
       address: c.address,
       number: c.number,
       complement: c.complement,
-      coordinates: c.coordinates
+      coordinates: c.coordinates,
     },
     likes: c.likes.length,
     description: c.description,
-    createdAt: c.createdAt
+    createdAt: c.createdAt,
   };
 }
 
@@ -95,5 +97,5 @@ module.exports = {
   getApprovedByReporterName,
   getPending,
   findById,
-  formatComplaintForPublic
+  formatComplaintForPublic,
 };
