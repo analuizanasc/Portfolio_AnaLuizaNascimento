@@ -46,7 +46,7 @@ describe("Register", () => {
             expect(response.body).to.have.property("error", "Email already registered")
         });
 
-        it("*should show an error, after trying to register a new resident with a name and address that already exists in the system", async () => {
+        it("should show an error, after trying to register a new resident with a name and address that already exists in the system", async () => {
 
             const { registerUser } = await registerValidUser();
             const duplicateUser = { ...registerUser, email: faker.internet.email() }
